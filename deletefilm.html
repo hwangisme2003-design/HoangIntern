@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hủy vé</title>
+  <style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to right, #f0f2f5, #e0e7ff);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+body::before {
+        content: "";
+        background-image: url('cgv3.webp'); /* thay bằng đường dẫn ảnh của bạn */
+        background-size: cover;
+        background-position: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        filter: blur(5px);
+        opacity: 0.6;
+        z-index: -1;
+    }
+    .container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    h2 {
+        color: #333;
+        margin-bottom: 24px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+        text-align: left;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        transition: border 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+        border-color: #4f46e5;
+        outline: none;
+    }
+
+    button {
+        padding: 12px 24px;
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #4338ca;
+    }
+
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        display: none;
+        text-align: center;
+    }
+
+    .popup button {
+        background-color: #4f46e5;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .popup button:hover {
+        background-color: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎟️ Hủy vé xem phim</h2>
+    <form action="deletefilm.php" method="POST" id="deleteForm">
+        <label for="id">Mã phim:</label>
+        <input type="text" name="id" required>
+        <button type="submit">Hủy Vé</button>
+    </form>
+  </div>
+
+  <!-- Popup Notification -->
+  <div class="popup" id="successPopup">
+    <p id="popupMessage"></p>
+    <button onclick="closePopup()">Đóng</button>
+  </div>
+
+  <script>
+    // Kiểm tra query string trong URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const message = urlParams.get('message');
+
+    // Hiển thị popup nếu có kết quả
+    if (status === 'success') {
+        document.getElementById('popupMessage').textContent = "✅ Xóa phim thành công!";
+        document.getElementById('successPopup').style.display = "block";
+    } else if (status === 'error' && message) {
+        document.getElementById('popupMessage').textContent = "❌ Lỗi khi xóa phim: " + message;
+        document.getElementById('successPopup').style.display = "block";
+    }
+
+    // Đóng popup
+    function closePopup() {
+        document.getElementById('successPopup').style.display = "none";
+    }
+  </script>
+</body>
+</html>
