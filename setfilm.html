@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đổi Vé Xem Phim</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('cgvbgrnd2.jpg') no-repeat center center/cover;
+            position: relative;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 80px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h2 {
+            color: #e44d26;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            width: 100%;
+            text-align: left;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #e44d26;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #c9381e;
+        }
+
+        .message-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .message-box button {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="container">
+        <h2>ĐỔI PHIM</h2>
+        <form id="editFilmForm" action="setfilm.php" method="POST">
+            <label for="filmID">ID Phim:</label>
+            <input type="number" name="filmID" required>
+
+            <label for="tenphim">Tên Phim:</label>
+            <input type="text" name="tenphim" required>
+
+            <label for="theloai">Thể Loại:</label>
+            <input type="text" name="theloai" required>
+
+            <label for="thoiluong">Thời Lượng (phút):</label>
+            <input type="number" name="thoiluong" required>
+
+            <label for="khoichieu">Ngày Khởi Chiếu:</label>
+            <input type="date" name="khoichieu" required>
+
+            <label for="hinhanh">Link Ảnh:</label>
+            <input type="text" name="hinhanh">
+
+            <button type="submit">Lưu Thay Đổi</button>
+        </form>
+    </div>
+
+    <!-- Hộp thông báo -->
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+        <button onclick="closeMessageBox()">Đóng</button>
+    </div>
+
+    <script>
+        // Lấy thông báo từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            document.getElementById('messageText').innerText = decodeURIComponent(message);
+            document.getElementById('messageBox').style.display = 'block';
+        }
+
+        function closeMessageBox() {
+            document.getElementById('messageBox').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Vé - CGV Cinema</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* (Giữ nguyên phần CSS bạn đã cung cấp) */
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: url('cgvbgrnd.jpg') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            backdrop-filter: blur(5px);
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            text-align: left;
+            margin: 5px 0;
+        }
+
+        /* Áp dụng styling chung cho input và select */
+        input, select { 
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        /* CSS cho trường tổng tiền tự động tính */
+        #tongtien_display {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            color: #e44d26;
+        }
+
+
+        button {
+            background-color: #e44d26;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #c63c1f;
+        }
+        /* Popup thông báo */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            background-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ĐẶT VÉ</h2>
+        <form id="addFilmForm" action="http://localhost/code-php/addfilm_user.php" method="POST">
+            <input type="hidden" id="phim_id_raw" name="id" value=""> 
+
+<div class="form-group">
+    <label for="tenphim">Tên phim:</label>
+    <select id="tenphim" name="tenphim" onchange="calculateTotal(); updatePhimId()" required>
+        <option value="" disabled selected>--- Chọn phim ---</option>
+        <option value="Past Lives" data-id="1" data-price="90000">Past Lives (90.000 VNĐ)</option>
+        <option value="Dune: Part Two" data-id="2" data-price="100000">Dune: Part Two (100.000 VNĐ)</option>
+        <option value="Phim Hoạt Hình ABC" data-id="3" data-price="80000">Phim Hoạt Hình ABC (80.000 VNĐ)</option>
+    </select>
+</div>
+
+            <label for="soluongve">Số vé:</label>
+            <input type="number" id="soluongve" name="soluongve" min="1" value="1" oninput="calculateTotal()" required>
+
+            <label for="tongtien">Tổng tiền:</label>
+            <input type="text" id="tongtien_display" placeholder="Vui lòng chọn phim" readonly>
+            
+            <input type="hidden" id="tongtien_raw" name="tongtien" value="0">
+
+            <label for="ngaydat">Ngày đặt:</label>
+            <input type="date" id="ngaydat" name="ngaydat" required>
+
+            <button type="submit">Đặt Vé</button>
+        </form>
+    </div>
+ <div class="popup" id="popup">
+        <p id="popup-message"></p>
+        <button onclick="closePopup()">Đóng</button>
+    </div>
+
+<script>
+    // Định nghĩa giá vé mặc định (sẽ bị ghi đè bởi giá trong data-price)
+    // const TICKET_PRICE = 90000; // Không cần dùng hằng số này nữa
+
+    /**
+     * Hàm tính tổng tiền dựa trên số lượng vé và giá vé của phim được chọn
+     */
+    function calculateTotal() {
+        const selectElement = document.getElementById('tenphim');
+        const quantityInput = document.getElementById('soluongve');
+        const displayInput = document.getElementById('tongtien_display');
+        const rawInput = document.getElementById('tongtien_raw');
+        
+        // 1. Lấy giá vé từ option được chọn
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        
+        let price = 0;
+        // Kiểm tra xem đã chọn phim (selectedIndex > 0) và có data-price không
+        if (selectedOption && selectedOption.value !== "") {
+            // Lấy giá vé từ thuộc tính data-price
+            price = parseInt(selectedOption.getAttribute('data-price')) || 0;
+        }
+
+        // 2. Lấy số lượng vé
+        let quantity = parseInt(quantityInput.value) || 0;
+        if (quantity < 0) quantity = 0; 
+        
+        // 3. Tính tổng tiền
+        const totalAmount = quantity * price;
+
+        // 4. Cập nhật giao diện và giá trị gửi
+        if (price === 0) {
+            displayInput.value = "Vui lòng chọn phim";
+            rawInput.value = 0;
+        } else {
+            // Định dạng tổng tiền để hiển thị
+            const formattedTotal = totalAmount.toLocaleString('vi-VN', { 
+                style: 'currency', 
+                currency: 'VND',
+                minimumFractionDigits: 0 
+            });
+            displayInput.value = formattedTotal;
+            rawInput.value = totalAmount; // Giá trị số thuần gửi lên server
+        }
+    }
+
+    // --- Xử lý sự kiện Submit Form và Popup ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Khởi tạo tính toán tổng tiền ban đầu (sẽ hiển thị "Vui lòng chọn phim")
+        calculateTotal(); 
+
+        document.getElementById("addFilmForm").addEventListener("submit", function(event) {
+            event.preventDefault(); 
+
+            let formData = new FormData(this);
+
+            fetch(this.action, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text()) 
+            .then(data => {
+                showPopup(data); 
+                document.getElementById("addFilmForm").reset(); 
+                // Quan trọng: Gọi lại hàm tính tiền sau khi reset để cập nhật tổng tiền về 0 và trạng thái ban đầu
+                calculateTotal(); 
+            })
+            .catch(error => console.error("Lỗi:", error));
+        });
+    });
+
+    function showPopup(message) {
+        document.getElementById("popup-message").innerText = message;
+        document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+</script>
+</body>
+</html>

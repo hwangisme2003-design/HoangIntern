@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Vé - CGV Cinema</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: url('cgvbgrnd.jpg') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            backdrop-filter: blur(5px); /* Làm mờ background */
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            text-align: left;
+            margin: 5px 0;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #e44d26;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #c63c1f;
+        }
+        /* Popup thông báo */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            background-color: #28a745;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>THÊM PHIM MỚI</h2>
+        <form id="addFilmForm" action="http://localhost/code-php/addfilm.php" method="POST">
+            <label for="id">ID:</label>
+            <input type="number" id="id" name="id" required>
+            
+            <label for="tenphim">Tên phim:</label>
+            <input type="text" id="tenphim" name="tenphim" required>
+
+            <label for="theloai">Thể loại:</label>
+            <input type="text" id="theloai" name="theloai" required>
+
+            <label for="thoiluong">Thời lượng (phút):</label>
+            <input type="number" id="thoiluong" name="thoiluong" required>
+
+            <label for="khoichieu">Ngày khởi chiếu:</label>
+            <input type="date" id="khoichieu" name="khoichieu" required>
+
+            <label for="hinhanh">Link ảnh:</label>
+            <input type="text" id="hinhanh" name="hinhanh">
+
+            <button type="submit">Thêm Phim</button>
+        </form>
+    </div>
+ <!-- Popup thông báo -->
+ <div class="popup" id="popup">
+    <p id="popup-message"></p>
+    <button onclick="closePopup()">Đóng</button>
+</div>
+
+<script>
+    document.getElementById("addFilmForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn chặn reload trang
+
+        let formData = new FormData(this);
+
+        fetch("http://localhost/code-php/addfilm.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.text()) // Nhận phản hồi từ PHP
+        .then(data => {
+            showPopup(data); // Hiển thị thông báo
+            document.getElementById("addFilmForm").reset(); // Xóa nội dung form
+        })
+        .catch(error => console.error("Lỗi:", error));
+    });
+
+    function showPopup(message) {
+        document.getElementById("popup-message").innerText = message;
+        document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+</script>
+</body>
+</html>

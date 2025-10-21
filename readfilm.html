@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"><?php
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "quanlyrapchieuphim";
+    
+    // Kết nối MySQL
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Kiểm tra lỗi kết nối
+    if ($conn->connect_error) {
+        die("Kết nối thất bại: " . $conn->connect_error);
+    }
+    
+    // Truy vấn danh sách phim
+    $sql = "SELECT * FROM phim";
+    $result = $conn->query($sql);
+    
+    // Kiểm tra lỗi truy vấn
+    if ($result === false) {
+        die("Lỗi truy vấn: " . $conn->error);
+    }
+    ?>
+    
+    <!DOCTYPE html>
+    <html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Danh sách phim</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table, th, td {
+                border: 1px solid black;
+                padding: 10px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+    
+    <h2>Danh sách Phim</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Tên Phim</th>
+            <th>Thể Loại</th>
+            <th>Thời Lượng (phút)</th>
+            <th>Ngày Khởi Chiếu</th>
+            <th>Hình Ảnh</th>
+        </tr>
+    
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr>
+                        <td>{$row['id']}</td>
+                        <td>{$row['tenphim']}</td>
+                        <td>" . (!empty($row['theloai']) ? $row['theloai'] : 'N/A') . "</td>
+                        <td>" . (!empty($row['thoiluong']) ? $row['thoiluong'] : 'N/A') . "</td>
+                        <td>" . (!empty($row['khoichieu']) ? $row['khoichieu'] : 'N/A') . "</td>
+                        <td><img src='{$row['hinhanh']}' alt='Hình ảnh' width='100'></td>
+                      </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='6'>Không có phim nào</td></tr>";
+        }
+        ?>
+    
+    </table>
+    
+    </body>
+    </html>
+    
+    <?php
+    $conn->close();
+    ?>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách vé đã đặt</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h2>Danh sách vé đã đặt</h2>
+        <div id="ticketList">
+            <!-- Danh sách vé sẽ được hiển thị ở đây -->
+        </div>
+    </div>
+    <script>
+        fetch('readfilm.php')
+            .then(response => response.text())
+            .then(data => document.getElementById('ticketList').innerHTML = data);
+    </script>
+</body>
+</html>
